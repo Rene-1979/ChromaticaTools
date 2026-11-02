@@ -5,6 +5,19 @@ import { STRUCTURE_FIXES, suggestTextColor } from './siteFixes'
 const PROXY_URL = import.meta.env.VITE_PROXY_URL || '/api/fetch'
 const MAX_STYLESHEETS = 10
 const MAX_ELEMENTS = 4000
+const MAX_TARGETS = 8
+
+// Ogni elemento con un problema riceve un id, così l'anteprima può evidenziarlo.
+let tagSeq = 0
+
+function tag(el) {
+    let id = el.getAttribute('data-cc-id')
+    if (!id) {
+        id = `cc${++tagSeq}`
+        el.setAttribute('data-cc-id', id)
+    }
+    return id
+}
 
 async function fetchRemote(url) {
     const response = await fetch(`${PROXY_URL}?url=${encodeURIComponent(url)}`)
@@ -192,10 +205,13 @@ function checkContrast(body, win) {
                 count: 0,
                 sample: text.slice(0, 70),
                 selector: describe(el),
+                targets: [],
             })
         }
 
-        groups.get(key).count++
+        const group = groups.get(key)
+        group.count++
+        if (group.targets.length < 5) group.targets.push(tag(el))
     }
 
     const pairs = [...groups.values()]
@@ -236,6 +252,7 @@ function checkColorOnlyLinks(body, win) {
                 linkHex,
                 textHex,
                 ratio,
+                targets: [tag(a)],
             })
         }
     })
@@ -245,12 +262,30 @@ function checkColorOnlyLinks(body, win) {
 
 function checkStructure(doc) {
     const issues = []
-    const add = (severity, rule, message, items = [], fix = null) =>
-        issues.push({ severity, rule, message, items: items.slice(0, 8), count: items.length, fix })
+    const add = (severity, rule, message, list = [], fix = null) => {
+        // list: stringhe oppure elementi del documento (da evidenziare)
+        const items = list.map((entry) =>
+            typeof entry === 'string' ? entry.slice(0, 120) : entry.label
+        )
+        const targets = list
+            .filter((entry) => typeof entry !== 'string')
+            .slice(0, MAX_TARGETS)
+            .map((entry) => tag(entry.el))
+
+        issues.push({
+            severity,
+            rule,
+            message,
+            items: items.slice(0, MAX_TARGETS),
+            count: list.length,
+            fix,
+            targets,
+        })
+    }
 
     const root = doc.documentElement
     if (!root.getAttribute('lang')) {
-        add('error', 'WCAG 3.1.1', 'Manca l\'attributo lang su <html>.', [], STRUCTURE_FIXES.lang)
+        add('error', 'WCAG 3.1.1', "Manca l'attributo lang su <html>.", [], STRUCTURE_FIXES.lang)
     }
 
     if (!doc.title.trim()) {
@@ -263,16 +298,24 @@ function checkStructure(doc) {
     }
 
     const headings = [...doc.querySelectorAll('h1,h2,h3,h4,h5,h6')]
-    const h1 = headings.filter((h) => h.tagName === 'H1').length
-    if (h1 === 0) add('warning', 'WCAG 1.3.1', 'Nessun titolo <h1> trovato.', [], STRUCTURE_FIXES.h1)
-    if (h1 > 1) add('warning', 'WCAG 1.3.1', `Sono presenti ${h1} titoli <h1>.`, [], STRUCTURE_FIXES.h1)
+    const h1s = headings.filter((h) => h.tagName === 'H1')
+    if (h1s.length === 0) add('warning', 'WCAG 1.3.1', 'Nessun titolo <h1> trovato.', [], STRUCTURE_FIXES.h1)
+    if (h1s.length > 1) {
+        add(
+            'warning',
+            'WCAG 1.3.1',
+            `Sono presenti ${h1s.length} titoli <h1>.`,
+            h1s.map((h) => ({ el: h, label: h.textContent.trim().slice(0, 60) || describe(h) })),
+            STRUCTURE_FIXES.h1
+        )
+    }
 
     const skips = []
     let prev = 0
     headings.forEach((h) => {
         const level = Number(h.tagName[1])
         if (prev && level > prev + 1) {
-            skips.push(`h${prev} → h${level}: ${h.textContent.trim().slice(0, 50)}`)
+            skips.push({ el: h, label: `h${prev} → h${level}: ${h.textContent.trim().slice(0, 50)}` })
         }
         prev = level
     })
@@ -280,7 +323,7 @@ function checkStructure(doc) {
 
     const noAlt = [...doc.querySelectorAll('img:not([alt])')]
         .filter((img) => img.getAttribute('role') !== 'presentation')
-        .map((img) => img.getAttribute('src') || '(senza src)')
+        .map((img) => ({ el: img, label: img.getAttribute('src') || '(senza src)' }))
     if (noAlt.length) add('error', 'WCAG 1.1.1', 'Immagini senza attributo alt.', noAlt, STRUCTURE_FIXES.alt)
 
     const unlabeled = [...doc.querySelectorAll('input, select, textarea')]
@@ -292,7 +335,7 @@ function checkStructure(doc) {
             if (f.id && doc.querySelector(`label[for="${CSS.escape(f.id)}"]`)) return false
             return true
         })
-        .map((f) => describe(f))
+        .map((f) => ({ el: f, label: describe(f) }))
     if (unlabeled.length) add('error', 'WCAG 1.3.1 / 4.1.2', 'Campi del modulo senza etichetta.', unlabeled, STRUCTURE_FIXES.label)
 
     const hasName = (el) =>
@@ -304,12 +347,12 @@ function checkStructure(doc) {
 
     const emptyLinks = [...doc.querySelectorAll('a[href]')]
         .filter((a) => !hasName(a))
-        .map((a) => a.getAttribute('href'))
+        .map((a) => ({ el: a, label: a.getAttribute('href') }))
     if (emptyLinks.length) add('error', 'WCAG 2.4.4', 'Link senza nome accessibile.', emptyLinks, STRUCTURE_FIXES.link)
 
     const emptyButtons = [...doc.querySelectorAll('button, [role="button"]')]
         .filter((b) => !hasName(b))
-        .map((b) => describe(b))
+        .map((b) => ({ el: b, label: describe(b) }))
     if (emptyButtons.length) add('error', 'WCAG 4.1.2', 'Pulsanti senza nome accessibile.', emptyButtons, STRUCTURE_FIXES.button)
 
     return issues
@@ -347,6 +390,7 @@ function checkVision(pairs) {
 
 export async function analyzeSite(rawUrl, onProgress = () => {}) {
     const url = normalizeUrl(rawUrl)
+    tagSeq = 0
 
     onProgress('Scarico la pagina…')
     const page = await fetchRemote(url)
@@ -390,9 +434,18 @@ export async function analyzeSite(rawUrl, onProgress = () => {}) {
     // Prepara il documento per il rendering statico (niente script, niente risorse attive)
     const render = doc.cloneNode(true)
     render.querySelectorAll('script, noscript, iframe, object, embed, link, meta[http-equiv="refresh"], base').forEach((n) => n.remove())
-    render.querySelectorAll('img, video, audio, source, picture').forEach((n) => {
-        n.removeAttribute('src')
-        n.removeAttribute('srcset')
+    render.querySelectorAll('source, video, audio').forEach((n) => n.remove())
+    render.querySelectorAll('img').forEach((img) => {
+        img.removeAttribute('srcset')
+        img.removeAttribute('loading')
+        const src = img.getAttribute('src')
+        if (src && !/^data:/i.test(src)) {
+            try {
+                img.setAttribute('src', new URL(src, finalUrl).href)
+            } catch {
+                img.removeAttribute('src')
+            }
+        }
     })
     render.querySelectorAll('style').forEach((s) => {
         s.textContent = absolutizeCssUrls(s.textContent, finalUrl)
@@ -434,6 +487,8 @@ export async function analyzeSite(rawUrl, onProgress = () => {}) {
             vision[type] = vision[type].slice(0, 25).map(withFix)
         })
 
+        const snapshot = '<!doctype html>' + iframe.contentDocument.documentElement.outerHTML
+
         const palette = [...contrast.pairs]
             .sort((a, b) => b.count - a.count)
             .slice(0, 8)
@@ -454,6 +509,7 @@ export async function analyzeSite(rawUrl, onProgress = () => {}) {
             colorOnlyLinks,
             structure,
             palette,
+            snapshot,
         }
     } finally {
         iframe.remove()

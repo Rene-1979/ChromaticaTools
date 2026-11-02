@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { analyzeSite } from '../utils/siteAnalyzer'
 import { VISION_LABELS } from '../utils/colorVision'
 import { STRUCTURE_FIXES } from '../utils/siteFixes'
@@ -42,7 +42,157 @@ function FixBox({ title = 'Come risolvere', text, code, isDark, children }) {
     )
 }
 
-function PairRow({ pair, simulated, muted, isDark }) {
+const PAGE_WIDTH = 1280
+const VIEW_HEIGHT = 460
+
+function ShowButton({ targets, title, onShow, isDark }) {
+    if (!targets?.length) return null
+
+    return (
+        <button
+            type="button"
+            onClick={() => onShow({ targets, title })}
+            className={`mt-3 inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+                isDark
+                    ? 'border-slate-600 text-slate-100 hover:bg-slate-800'
+                    : 'border-slate-300 text-slate-800 hover:bg-slate-100'
+            }`}
+        >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" aria-hidden="true">
+                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+                <circle cx="12" cy="12" r="3" />
+            </svg>
+            Mostra dove
+        </button>
+    )
+}
+
+function PreviewDialog({ snapshot, finalUrl, preview, onClose, isDark }) {
+    const boxRef = useRef(null)
+    const closeRef = useRef(null)
+    const [scale, setScale] = useState(null)
+
+    useEffect(() => {
+        closeRef.current?.focus()
+
+        function onKey(event) {
+            if (event.key === 'Escape') onClose()
+        }
+
+        document.addEventListener('keydown', onKey)
+        return () => document.removeEventListener('keydown', onKey)
+    }, [onClose])
+
+    useEffect(() => {
+        const box = boxRef.current
+        if (!box) return
+
+        const update = () =>
+            setScale(Math.min(1, box.clientWidth / PAGE_WIDTH))
+
+        update()
+        const observer = new ResizeObserver(update)
+        observer.observe(box)
+        return () => observer.disconnect()
+    }, [])
+
+    const srcDoc = useMemo(() => {
+        const selectors = preview.targets
+            .map((id) => `[data-cc-id="${id}"]`)
+            .join(',')
+        const base = finalUrl.replace(/"/g, '&quot;')
+        const injected =
+            `<base href="${base}"><style>` +
+            `html{pointer-events:none}` +
+            `${selectors}{outline:4px solid #ef4444!important;outline-offset:3px!important;` +
+            `box-shadow:0 0 0 8px rgba(239,68,68,.3)!important}` +
+            `</style>`
+
+        return snapshot.replace(/<head[^>]*>/i, (match) => match + injected)
+    }, [snapshot, finalUrl, preview.targets])
+
+    function handleLoad(event) {
+        const frame = event.currentTarget
+        const el = frame.contentDocument?.querySelector(
+            `[data-cc-id="${preview.targets[0]}"]`
+        )
+        if (!el) return
+
+        const rect = el.getBoundingClientRect()
+        const visible = VIEW_HEIGHT / (scale || 1)
+        frame.contentWindow.scrollTo(
+            0,
+            Math.max(0, rect.top + frame.contentWindow.scrollY - visible / 2 + rect.height / 2)
+        )
+    }
+
+    return (
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+            onClick={onClose}
+        >
+            <div
+                role="dialog"
+                aria-modal="true"
+                aria-label="Anteprima del problema"
+                onClick={(event) => event.stopPropagation()}
+                className={`w-full max-w-5xl rounded-2xl border p-5 shadow-2xl ${
+                    isDark
+                        ? 'border-slate-700 bg-slate-900 text-white'
+                        : 'border-slate-200 bg-white text-slate-900'
+                }`}
+            >
+                <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                        <h3 className="text-xl font-bold">Dove si trova il problema</h3>
+                        <p className="mt-1 text-sm">
+                            {preview.title}. Il riquadro rosso indica
+                            {preview.targets.length > 1 ? ' gli elementi interessati' : " l'elemento interessato"}.
+                        </p>
+                    </div>
+                    <button
+                        ref={closeRef}
+                        type="button"
+                        onClick={onClose}
+                        className="shrink-0 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
+                    >
+                        Chiudi
+                    </button>
+                </div>
+
+                <div
+                    ref={boxRef}
+                    className="mt-4 overflow-hidden rounded-xl border border-slate-500/40 bg-white"
+                    style={{ height: VIEW_HEIGHT }}
+                >
+                    {scale && (
+                        <iframe
+                            title="Anteprima della pagina con il problema evidenziato"
+                            sandbox="allow-same-origin"
+                            srcDoc={srcDoc}
+                            onLoad={handleLoad}
+                            style={{
+                                width: PAGE_WIDTH,
+                                height: VIEW_HEIGHT / scale,
+                                border: 0,
+                                background: '#fff',
+                                transform: `scale(${scale})`,
+                                transformOrigin: 'top left',
+                            }}
+                        />
+                    )}
+                </div>
+
+                <p className="mt-3 text-sm">
+                    Anteprima statica: gli script non vengono eseguiti, quindi
+                    la pagina reale può avere un aspetto leggermente diverso.
+                </p>
+            </div>
+        </div>
+    )
+}
+
+function PairRow({ pair, simulated, muted, isDark, onShow }) {
     const fg = simulated ? pair.simFg : pair.fg
     const bg = simulated ? pair.simBg : pair.bg
     const ratio = simulated ? pair.simRatio : pair.ratio
@@ -65,6 +215,13 @@ function PairRow({ pair, simulated, muted, isDark }) {
                 <p className={`mt-1 truncate text-sm ${muted}`}>
                     {pair.selector} · {pair.count} {pair.count === 1 ? 'elemento' : 'elementi'} · “{pair.sample}”
                 </p>
+
+                <ShowButton
+                    targets={pair.targets}
+                    title={`Testo “${pair.sample.slice(0, 40)}” con contrasto ${ratio.toFixed(2)}:1`}
+                    onShow={onShow}
+                    isDark={isDark}
+                />
 
                 {pair.fix && (
                     <FixBox
@@ -90,6 +247,7 @@ function SiteAnalyzer({ isDark }) {
     const [error, setError] = useState('')
     const [report, setReport] = useState(null)
     const [vision, setVision] = useState('protanopia')
+    const [preview, setPreview] = useState(null)
 
     const surface = isDark
         ? 'border-slate-800 bg-slate-900'
@@ -102,6 +260,7 @@ function SiteAnalyzer({ isDark }) {
         setStatus('loading')
         setError('')
         setReport(null)
+        setPreview(null)
 
         try {
             const result = await analyzeSite(input, setProgress)
@@ -223,7 +382,7 @@ function SiteAnalyzer({ isDark }) {
                         ) : (
                             <ul className={`mt-3 divide-y ${divider}`}>
                                 {report.contrast.failing.slice(0, 25).map((pair) => (
-                                    <PairRow key={`${pair.fg}${pair.bg}${pair.large}`} pair={pair} muted={muted} isDark={isDark} />
+                                    <PairRow key={`${pair.fg}${pair.bg}${pair.large}`} pair={pair} muted={muted} isDark={isDark} onShow={setPreview} />
                                 ))}
                             </ul>
                         )}
@@ -265,7 +424,7 @@ function SiteAnalyzer({ isDark }) {
                         ) : (
                             <ul className={`mt-3 divide-y ${divider}`}>
                                 {report.vision[vision].slice(0, 25).map((pair) => (
-                                    <PairRow key={`${pair.fg}${pair.bg}${pair.large}`} pair={pair} simulated muted={muted} isDark={isDark} />
+                                    <PairRow key={`${pair.fg}${pair.bg}${pair.large}`} pair={pair} simulated muted={muted} isDark={isDark} onShow={setPreview} />
                                 ))}
                             </ul>
                         )}
@@ -284,6 +443,12 @@ function SiteAnalyzer({ isDark }) {
                                                 Contrasto link/testo circostante {l.ratio.toFixed(2)}:1 (minimo 3:1)
                                                 e nessuna sottolineatura (WCAG 1.4.1).
                                             </p>
+                                            <ShowButton
+                                                targets={l.targets}
+                                                title={`Link “${l.text.slice(0, 40)}” distinguibile solo dal colore`}
+                                                onShow={setPreview}
+                                                isDark={isDark}
+                                            />
                                             <FixBox
                                                 isDark={isDark}
                                                 text={STRUCTURE_FIXES.colorOnlyLink.text}
@@ -319,6 +484,12 @@ function SiteAnalyzer({ isDark }) {
                                             {issue.count > 0 && ` (${issue.count})`}
                                         </p>
                                         <p className={`mt-1 text-sm ${muted}`}>{issue.rule}</p>
+                                        <ShowButton
+                                            targets={issue.targets}
+                                            title={issue.message.replace(/\.$/, '')}
+                                            onShow={setPreview}
+                                            isDark={isDark}
+                                        />
                                         {issue.fix && (
                                             <FixBox isDark={isDark} text={issue.fix.text} code={issue.fix.code} />
                                         )}
@@ -339,6 +510,16 @@ function SiteAnalyzer({ isDark }) {
                         </p>
                     </div>
                 </>
+            )}
+
+            {report && preview && (
+                <PreviewDialog
+                    snapshot={report.snapshot}
+                    finalUrl={report.finalUrl}
+                    preview={preview}
+                    onClose={() => setPreview(null)}
+                    isDark={isDark}
+                />
             )}
         </section>
     )
