@@ -100,6 +100,10 @@ src/utils/        contrasto, simulazione daltonismo, analizzatore, soluzioni sug
 proxy/            proxy per Cloudflare Workers e controlli di sicurezza condivisi
 ```
 
+### Licenza
+
+Distribuito con licenza [MIT](LICENSE): puoi usare, modificare e ridistribuire il codice, anche per scopi commerciali, mantenendo l'avviso di copyright.
+
 ---
 
 ## 🇬🇧 English
@@ -195,3 +199,7 @@ src/components/   app tabs (Contrast, Analyse site, Palettes, …)
 src/utils/        contrast, colour-blindness simulation, analyser, suggested fixes
 proxy/            Cloudflare Workers proxy and shared security checks
 ```
+
+### License
+
+Released under the [MIT License](LICENSE): you may use, modify and redistribute the code, including commercially, as long as you keep the copyright notice.
