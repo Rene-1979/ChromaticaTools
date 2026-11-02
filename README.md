@@ -102,7 +102,9 @@ proxy/            proxy per Cloudflare Workers e controlli di sicurezza condivis
 
 ### Licenza
 
-Distribuito con licenza [MIT](LICENSE): puoi usare, modificare e ridistribuire il codice, anche per scopi commerciali, mantenendo l'avviso di copyright.
+Il codice è **visibile e liberamente utilizzabile per scopi non commerciali** (uso personale, studio, ricerca, scuole, enti pubblici e organizzazioni non profit) secondo la licenza [PolyForm Noncommercial 1.0.0](LICENSE). **L'uso commerciale non è consentito** senza un accordo scritto con l'autore: per richiederlo, apri una [issue](https://github.com/Rene-1979/ChromaticaTools/issues).
+
+Non è una licenza «open source» in senso stretto (OSI), ma una licenza *source-available*.
 
 ---
 
@@ -202,4 +204,6 @@ proxy/            Cloudflare Workers proxy and shared security checks
 
 ### License
 
-Released under the [MIT License](LICENSE): you may use, modify and redistribute the code, including commercially, as long as you keep the copyright notice.
+The code is **visible and free to use for noncommercial purposes** (personal use, study, research, schools, public bodies and non-profit organisations) under the [PolyForm Noncommercial 1.0.0](LICENSE) license. **Commercial use is not permitted** without a written agreement with the author: to ask for one, open an [issue](https://github.com/Rene-1979/ChromaticaTools/issues).
+
+This is not an "open source" license in the strict (OSI) sense, but a *source-available* one.
