@@ -1,26 +1,16 @@
 
 import { useState, useRef } from 'react'
 import { hslToHex } from '../utils/colorConversions'
+import { HARMONIES } from '../utils/colorHarmony'
 import ExportPanel from './ExportPanel'
 
-const MODES = {
-    analogous: {
-        label: 'Analogo',
-        offsets: [-30, 0, 30],
-    },
-    complementary: {
-        label: 'Complementare',
-        offsets: [0, 180],
-    },
-    'split-complementary': {
-        label: 'Complementare diviso',
-        offsets: [0, 150, 210],
-    },
-    triad: {
-        label: 'Triade',
-        offsets: [0, 120, 240],
-    },
-}
+// Armonie condivise con palette e palette da immagine (utils/colorHarmony).
+const MODES = Object.fromEntries(
+    HARMONIES.map((harmony) => [
+        harmony.id,
+        { label: harmony.label, offsets: harmony.angles },
+    ])
+)
 
 const normalizeHue = (hue) => ((hue % 360) + 360) % 360
 
@@ -71,7 +61,7 @@ function hexToHue(hex) {
 }
 
 function ColorWheel({ onColorSelect, isDark }) {
-    const [mode, setMode] = useState('triad')
+    const [mode, setMode] = useState('triadic')
     const [hues, setHues] = useState([200, 320, 80])
     const [locked, setLocked] = useState([false, false, false])
     const [activePoint, setActivePoint] = useState(0)

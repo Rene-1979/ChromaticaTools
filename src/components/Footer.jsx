@@ -32,7 +32,8 @@ function Footer({ isDark, tabs, onNavigate }) {
 
                         <p className={`mt-4 max-w-md text-base leading-relaxed ${muted}`}>
                             Strumenti gratuiti per verificare il contrasto WCAG,
-                            creare palette e gradienti, simulare il daltonismo
+                            creare palette (anche da un'immagine) e gradienti,
+                            simulare il daltonismo
                             ed esportare i colori in CSS e JSON.
                         </p>
                     </div>

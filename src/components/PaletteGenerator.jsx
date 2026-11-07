@@ -1,18 +1,11 @@
 
 import { useState } from 'react'
-import { getColorHarmony } from '../utils/colorHarmony'
+import { HARMONIES, getColorHarmony } from '../utils/colorHarmony'
 import { hexToHsl, hslToHex } from '../utils/colorConversions'
 import ExportPanel from './ExportPanel'
 
 const INITIAL_COLOR = '#6366F1'
 const PALETTE_SIZE = 5
-
-const HARMONIES = [
-    { id: 'analogous', label: 'Analoga' },
-    { id: 'complementary', label: 'Complementare' },
-    { id: 'split-complementary', label: 'Complementare divisa' },
-    { id: 'triadic', label: 'Triade' },
-]
 
 function normalizeHex(value) {
     let hex = value.trim().replace(/^#/, '')
@@ -131,12 +124,61 @@ function buildPalette(baseColor, harmony, lockedColors = {}) {
         }))
 }
 
-function PaletteGenerator({ isDark }) {
-    const [baseColor, setBaseColor] = useState(INITIAL_COLOR)
-    const [baseColorInput, setBaseColorInput] = useState(INITIAL_COLOR)
-    const [harmony, setHarmony] = useState('analogous')
+/**
+ * Palette scelta in "Palette da immagine": i suoi colori occupano i primi slot
+ * (sbloccati, quindi modificabili e bloccabili come tutti gli altri); gli
+ * slot rimasti si riempiono con colori dell'armonia non troppo simili.
+ */
+function buildImportedPalette({ colors, base, harmony }) {
+    const filled = colors
+        .map((color) => normalizeHex(color))
+        .filter(Boolean)
+        .slice(0, PALETTE_SIZE)
+
+    const baseHsl = hexToHsl(base)
+    const candidates = buildPalette(base, harmony).map((item) => item.color)
+
+    for (const candidate of candidates) {
+        if (filled.length >= PALETTE_SIZE) break
+
+        if (!filled.some((color) => areColorsTooSimilar(color, candidate))) {
+            filled.push(candidate)
+        }
+    }
+
+    let fallbackIndex = 0
+
+    while (filled.length < PALETTE_SIZE) {
+        const candidate = hslToHex(
+            (baseHsl.h + fallbackIndex * 71 + 11) % 360,
+            65,
+            30 + (fallbackIndex % 5) * 14
+        )
+
+        if (!filled.some((color) => areColorsTooSimilar(color, candidate))) {
+            filled.push(candidate)
+        }
+
+        fallbackIndex++
+    }
+
+    return filled.map((color, id) => ({ id, color, locked: false }))
+}
+
+function PaletteGenerator({ isDark, imported }) {
+    const initialBase = normalizeHex(imported?.base ?? '') || INITIAL_COLOR
+
+    const [baseColor, setBaseColor] = useState(initialBase)
+    const [baseColorInput, setBaseColorInput] = useState(initialBase)
+    const [harmony, setHarmony] = useState(imported?.harmony ?? 'analogous')
     const [palette, setPalette] = useState(() =>
-        buildPalette(INITIAL_COLOR, 'analogous')
+        imported
+            ? buildImportedPalette({
+                  colors: imported.colors,
+                  base: initialBase,
+                  harmony: imported.harmony,
+              })
+            : buildPalette(INITIAL_COLOR, 'analogous')
     )
     const [hexInputs, setHexInputs] = useState({})
     const [copied, setCopied] = useState('')
@@ -292,6 +334,16 @@ function PaletteGenerator({ isDark }) {
                     Crea combinazioni cromatiche, blocca i colori
                     preferiti e copia la palette nei tuoi progetti.
                 </p>
+
+                {imported && (
+                    <p
+                        role="status"
+                        className="mt-4 rounded-xl border border-indigo-500/40 bg-indigo-500/10 px-4 py-3 text-base"
+                    >
+                        Palette caricata da «Palette da immagine». Puoi
+                        modificarla, bloccare i colori ed esportarla.
+                    </p>
+                )}
             </div>
 
             {/* Impostazioni */}

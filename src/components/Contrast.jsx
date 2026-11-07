@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { getContrastSuggestions } from '../utils/colorSuggestions'
+import { getWcagStatus } from '../utils/contrast'
 import ExportPanel from './ExportPanel'
 
 function Contrast({
@@ -44,18 +45,7 @@ function Contrast({
         }
     }
 
-    function getStatus(value) {
-        const numericValue = Number(value)
-
-        return {
-            aaNormal: numericValue >= 4.5,
-            aaLarge: numericValue >= 3,
-            aaaNormal: numericValue >= 7,
-            aaaLarge: numericValue >= 4.5,
-        }
-    }
-
-    const status = getStatus(ratio)
+    const status = getWcagStatus(ratio)
 
     const resultColor = status.aaNormal
         ? 'text-green-600'
@@ -278,7 +268,7 @@ function Contrast({
 
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {displaySuggestions.map((suggestion) => {
-                        const suggestionStatus = getStatus(suggestion.ratio)
+                        const suggestionStatus = getWcagStatus(suggestion.ratio)
 
                         let suggestionResult
                         let suggestionColor

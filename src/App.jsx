@@ -8,6 +8,7 @@ import ColorWheel from './components/ColorWheel'
 import ColorExplorer from './components/ColorExplorer'
 import GradientGenerator from './components/GradientGenerator'
 import PaletteGenerator from './components/PaletteGenerator'
+import ImagePalette from './components/ImagePalette'
 import Accessibility from './components/Accessibility'
 import SiteAnalyzer from './components/SiteAnalyzer'
 
@@ -21,6 +22,21 @@ function App() {
     const [activeTab, setActiveTab] = useState('contrast')
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
+    // Palette scelta in "Palette da immagine", da caricare nel generatore.
+    const [importedPalette, setImportedPalette] = useState(null)
+
+    // Cambiando scheda la palette importata è già stata consumata: la dimentichiamo.
+    function changeTab(id) {
+        setActiveTab(id)
+        setImportedPalette(null)
+    }
+
+    function applyImagePalette(palette) {
+        setImportedPalette(palette)
+        setActiveTab('palettes')
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+
     const ratio = getContrastRatio(foreground, background)
 
     const tabs = [
@@ -29,6 +45,7 @@ function App() {
         { id: 'site', label: 'Analizza sito' },
         { id: 'wheel', label: 'Ruota cromatica' },
         { id: 'palettes', label: 'Palette' },
+        { id: 'image-palette', label: 'Palette da immagine' },
         { id: 'explorer', label: 'Esplora colori' },
         { id: 'gradients', label: 'Gradienti' },
     ]
@@ -67,6 +84,13 @@ function App() {
                 <circle cx="16" cy="8.5" r="1" />
             </svg>
         ),
+        'image-palette': (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="16" rx="3" />
+                <circle cx="9" cy="10" r="1.6" />
+                <path d="m4 18 5-5 4 4 3-3 4 4" />
+            </svg>
+        ),
         site: (
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5" aria-hidden="true">
                 <circle cx="12" cy="12" r="9" />
@@ -94,7 +118,7 @@ function App() {
                 <Header
                     isDark={isDark}
                     onToggleDarkMode={() => setIsDark(!isDark)}
-                    onGoHome={() => setActiveTab('contrast')}
+                    onGoHome={() => changeTab('contrast')}
                 />
 
                 <nav
@@ -166,7 +190,7 @@ function App() {
                                         key={tab.id}
                                         type="button"
                                         onClick={() => {
-                                            setActiveTab(tab.id)
+                                            changeTab(tab.id)
                                             setIsMobileMenuOpen(false)
                                         }}
                                         aria-current={isActive ? 'page' : undefined}
@@ -197,7 +221,7 @@ function App() {
                                     <button
                                         key={tab.id}
                                         type="button"
-                                        onClick={() => setActiveTab(tab.id)}
+                                        onClick={() => changeTab(tab.id)}
                                         aria-pressed={isActive}
                                         className={`flex shrink-0 items-center gap-2.5 rounded-xl px-4 py-3 text-base font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                                             isActive
@@ -252,7 +276,17 @@ function App() {
                     )}
 
                     {activeTab === 'palettes' && (
-                        <PaletteGenerator isDark={isDark} />
+                        <PaletteGenerator
+                            isDark={isDark}
+                            imported={importedPalette}
+                        />
+                    )}
+
+                    {activeTab === 'image-palette' && (
+                        <ImagePalette
+                            isDark={isDark}
+                            onApplyPalette={applyImagePalette}
+                        />
                     )}
 
                     {activeTab === 'explorer' && (
@@ -268,7 +302,7 @@ function App() {
                     isDark={isDark}
                     tabs={tabs}
                     onNavigate={(id) => {
-                        setActiveTab(id)
+                        changeTab(id)
                         window.scrollTo({ top: 0, behavior: 'smooth' })
                     }}
                 />

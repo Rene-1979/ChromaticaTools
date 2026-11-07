@@ -37,3 +37,20 @@ export function getContrastRatio(color1, color2) {
 
     return (lighter + 0.05) / (darker + 0.05)
 }
+
+/**
+ * Livelli WCAG raggiunti da un rapporto di contrasto.
+ *
+ * AA: 4,5:1 testo normale, 3:1 testo grande.
+ * AAA: 7:1 testo normale, 4,5:1 testo grande.
+ */
+export function getWcagStatus(ratio) {
+    const value = Number(ratio)
+
+    return {
+        aaNormal: value >= 4.5,
+        aaLarge: value >= 3,
+        aaaNormal: value >= 7,
+        aaaLarge: value >= 4.5,
+    }
+}
