@@ -15,7 +15,7 @@ Chromatica Tools è un insieme di strumenti gratuiti per lavorare con i colori i
 | Scheda | Cosa fa |
 | --- | --- |
 | **Contrasto** | Calcola il rapporto di contrasto tra testo e sfondo e verifica i livelli WCAG AA/AAA. |
-| **Accessibilità** | Simula protanopia, deuteranopia e tritanopia su una combinazione di colori. |
+| **Daltonismo** | Simula protanopia, deuteranopia e tritanopia su una combinazione di colori. |
 | **Analizza sito** | Inserisci un URL: controlla contrasto, daltonismo e principali problemi di accessibilità, con soluzioni suggerite e anteprima del punto esatto del problema. |
 | **Ruota cromatica** | Esplora le armonie di colore. |
 | **Palette** | Genera palette coerenti, blocca i colori che ti piacciono ed esportale. |
@@ -24,6 +24,8 @@ Chromatica Tools è un insieme di strumenti gratuiti per lavorare con i colori i
 | **Gradienti** | Crea gradienti ed esportali. |
 
 Le palette e i colori si possono esportare in diversi formati.
+
+Nel menu le schede sono raggruppate: **Accessibilità colore** (Contrasto, Daltonismo), **Strumenti d'analisi** (Analizza sito, Palette da immagine), poi Ruota cromatica, Palette, Esplora colori e Gradienti.
 
 ### Analizza sito
 
@@ -130,7 +132,7 @@ Chromatica Tools is a free set of tools for working with colour accessibly: WCAG
 | Tab | What it does |
 | --- | --- |
 | **Contrast** (*Contrasto*) | Computes the text/background contrast ratio and checks WCAG AA/AAA levels. |
-| **Accessibility** (*Accessibilità*) | Simulates protanopia, deuteranopia and tritanopia on a colour pair. |
+| **Colour blindness** (*Daltonismo*) | Simulates protanopia, deuteranopia and tritanopia on a colour pair. |
 | **Analyse site** (*Analizza sito*) | Enter a URL: it checks contrast, colour blindness and the main accessibility issues, with suggested fixes and a preview of exactly where each problem is. |
 | **Colour wheel** (*Ruota cromatica*) | Explore colour harmonies. |
 | **Palettes** (*Palette*) | Generate coherent palettes, lock the colours you like and export them. |
@@ -139,6 +141,8 @@ Chromatica Tools is a free set of tools for working with colour accessibly: WCAG
 | **Gradients** (*Gradienti*) | Build and export gradients. |
 
 Colours and palettes can be exported in several formats. The interface is currently in Italian.
+
+In the menu the tabs are grouped: **Colour accessibility** (*Accessibilità colore*: Contrast, Colour blindness), **Analysis tools** (*Strumenti d'analisi*: Analyse site, Palette from image), then Colour wheel, Palettes, Colour explorer and Gradients.
 
 ### Analyse site
 

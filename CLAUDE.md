@@ -12,7 +12,9 @@ Istruzioni per Claude Code. Leggile all'inizio di ogni sessione.
 React + Vite + Tailwind (`@tailwindcss/vite`), eslint. "Analizza sito" usa un worker Cloudflare in `proxy/` (`worker.js`, `guard.js`); l'indirizzo pubblico del worker e' in `.env.production` (`VITE_PROXY_URL`).
 
 ## Struttura (cosa e' dove)
-- `src/App.jsx`: nessun router, un solo `activeTab`. Menu: Contrasto, Accessibilita', Analizza sito, Ruota cromatica, Palette, Palette da immagine, Esplora colori, Gradienti. Le schede si smontano al cambio: il loro stato locale si perde. Per cambiare scheda usare `changeTab` (non `setActiveTab`): azzera la palette importata.
+- `src/App.jsx`: nessun router, un solo `activeTab`. Il menu e' l'array `menu` (voci singole e gruppi con `children`): "Accessibilita' colore" (Contrasto, Daltonismo), "Strumenti d'analisi" (Analizza sito, Palette da immagine), poi Ruota cromatica, Palette, Esplora colori, Gradienti. `tabs` e' l'elenco piatto derivato (titolo mobile, footer). Le schede si smontano al cambio: il loro stato locale si perde. Per cambiare scheda usare `changeTab` (non `setActiveTab`): azzera la palette importata.
+- `src/components/MainNav.jsx`: il menu (tendine su desktop con clic, Esc, frecce; elenco raggruppato su mobile). Le voci vanno a capo, non scorrono. Per aggiungere una scheda: voce in `menu` di `App.jsx`, icona in `icons`, blocco `activeTab === ...`.
+- La scheda `accessibility` (file `Accessibility.jsx`) si chiama "Daltonismo" nell'interfaccia; l'id e i nomi dei file sono rimasti uguali.
 - `src/utils/colorHarmony.js`: **unica fonte** delle armonie (`HARMONIES`: id, etichetta, angoli HSL). La usano ruota, generatore di palette e palette da immagine. Non riscrivere angoli o etichette altrove.
 - `src/components/ExportPanel.jsx` + `src/utils/exportFormats.js`: esportazione unica (CSS, JSON, HTML) per tutte le schede.
 - `src/utils/contrast.js`: `getContrastRatio` e `getWcagStatus` (soglie AA/AAA).

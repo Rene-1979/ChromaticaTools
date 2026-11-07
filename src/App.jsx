@@ -2,6 +2,7 @@
 import { useState } from 'react'
 
 import Header from './components/Header'
+import MainNav from './components/MainNav'
 import Footer from './components/Footer'
 import Contrast from './components/Contrast'
 import ColorWheel from './components/ColorWheel'
@@ -20,7 +21,6 @@ function App() {
     const [isDark, setIsDark] = useState(true)
 
     const [activeTab, setActiveTab] = useState('contrast')
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
     // Palette scelta in "Palette da immagine", da caricare nel generatore.
     const [importedPalette, setImportedPalette] = useState(null)
@@ -39,16 +39,34 @@ function App() {
 
     const ratio = getContrastRatio(foreground, background)
 
-    const tabs = [
-        { id: 'contrast', label: 'Contrasto' },
-        { id: 'accessibility', label: 'Accessibilità' },
-        { id: 'site', label: 'Analizza sito' },
+    // Menu principale: voci singole e gruppi con sottomenu.
+    const menu = [
+        {
+            id: 'group-color-accessibility',
+            label: 'Accessibilità colore',
+            icon: 'contrast',
+            children: [
+                { id: 'contrast', label: 'Contrasto' },
+                { id: 'accessibility', label: 'Daltonismo' },
+            ],
+        },
+        {
+            id: 'group-analysis',
+            label: 'Strumenti d\'analisi',
+            icon: 'site',
+            children: [
+                { id: 'site', label: 'Analizza sito' },
+                { id: 'image-palette', label: 'Palette da immagine' },
+            ],
+        },
         { id: 'wheel', label: 'Ruota cromatica' },
         { id: 'palettes', label: 'Palette' },
-        { id: 'image-palette', label: 'Palette da immagine' },
         { id: 'explorer', label: 'Esplora colori' },
         { id: 'gradients', label: 'Gradienti' },
     ]
+
+    // Elenco piatto di tutte le schede (titolo mobile, footer).
+    const tabs = menu.flatMap((item) => item.children ?? [item])
 
     const icons = {
         contrast: (
@@ -121,126 +139,14 @@ function App() {
                     onGoHome={() => changeTab('contrast')}
                 />
 
-                <nav
-                    aria-label="Strumenti colore"
-                    className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8"
-                >
-                    <div
-                        className={`rounded-2xl border p-2 transition-colors duration-300 ${
-                            isDark
-                                ? 'border-slate-800 bg-gray-950'
-                                : 'border-gray-200 bg-white shadow-sm'
-                        }`}
-                    >
-                        <div className="flex items-center justify-between gap-3 lg:hidden">
-                            <div className="flex min-w-0 items-center gap-3 px-3 py-2">
-                                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white">
-                                    <span className="text-lg font-bold">C</span>
-                                </span>
-
-                                <div className="min-w-0">
-                                    <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>
-                                        CHROMATICA TOOLS
-                                    </p>
-                                    <p className={`truncate text-base font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                                        {tabs.find((tab) => tab.id === activeTab)?.label}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <button
-                                type="button"
-                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                                aria-expanded={isMobileMenuOpen}
-                                aria-controls="mobile-color-menu"
-                                aria-label={isMobileMenuOpen ? 'Chiudi menu' : 'Apri menu'}
-                                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
-                                    isDark
-                                        ? 'text-slate-200 hover:bg-slate-800'
-                                        : 'text-gray-700 hover:bg-gray-100'
-                                }`}
-                            >
-                                {isMobileMenuOpen ? (
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-6 w-6" aria-hidden="true">
-                                        <path d="m18 6-12 12M6 6l12 12" />
-                                    </svg>
-                                ) : (
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-6 w-6" aria-hidden="true">
-                                        <path d="M4 6h16M4 12h16M4 18h16" />
-                                    </svg>
-                                )}
-                            </button>
-                        </div>
-
-                        <div
-                            id="mobile-color-menu"
-                            className={`${
-                                isMobileMenuOpen
-                                    ? 'mt-2 grid gap-1 border-t pt-2'
-                                    : 'hidden'
-                            } lg:hidden ${
-                                isDark ? 'border-slate-800' : 'border-gray-100'
-                            }`}
-                        >
-                            {tabs.map((tab) => {
-                                const isActive = activeTab === tab.id
-
-                                return (
-                                    <button
-                                        key={tab.id}
-                                        type="button"
-                                        onClick={() => {
-                                            changeTab(tab.id)
-                                            setIsMobileMenuOpen(false)
-                                        }}
-                                        aria-current={isActive ? 'page' : undefined}
-                                        className={`flex w-full items-center rounded-xl px-4 py-3 text-left text-base font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
-                                            isActive
-                                                ? 'bg-indigo-600 text-white'
-                                                : isDark
-                                                    ? 'text-white hover:bg-slate-800'
-                                                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-950'
-                                        }`}
-                                    >
-                                        <span>{tab.label}</span>
-                                        {isActive && (
-                                            <span className="ml-auto text-sm text-indigo-100">
-                                                Attivo
-                                            </span>
-                                        )}
-                                    </button>
-                                )
-                            })}
-                        </div>
-
-                        <div className="hidden gap-2 overflow-x-auto pb-1 lg:flex">
-                            {tabs.map((tab) => {
-                                const isActive = activeTab === tab.id
-
-                                return (
-                                    <button
-                                        key={tab.id}
-                                        type="button"
-                                        onClick={() => changeTab(tab.id)}
-                                        aria-pressed={isActive}
-                                        className={`flex shrink-0 items-center gap-2.5 rounded-xl px-4 py-3 text-base font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
-                                            isActive
-                                                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-950/20'
-                                                : isDark
-                                                    ? 'text-white hover:bg-slate-800'
-                                                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-950'
-                                        }`}
-                                    >
-                                        <span className={isDark || isActive ? 'text-white' : 'text-gray-600'}>
-                                            {icons[tab.id]}
-                                        </span>
-                                        <span>{tab.label}</span>
-                                    </button>
-                                )
-                            })}
-                        </div>
-                    </div>
-                </nav>
+                <MainNav
+                    isDark={isDark}
+                    menu={menu}
+                    tabs={tabs}
+                    icons={icons}
+                    activeTab={activeTab}
+                    onSelect={changeTab}
+                />
 
                 <div className="mx-auto w-full max-w-7xl flex-1 px-4 pb-12 pt-8 sm:px-6 lg:px-8">
                     {activeTab === 'contrast' && (
@@ -279,6 +185,7 @@ function App() {
                         <PaletteGenerator
                             isDark={isDark}
                             imported={importedPalette}
+                            onOpenImagePalette={() => changeTab('image-palette')}
                         />
                     )}
 

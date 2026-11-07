@@ -165,7 +165,7 @@ function buildImportedPalette({ colors, base, harmony }) {
     return filled.map((color, id) => ({ id, color, locked: false }))
 }
 
-function PaletteGenerator({ isDark, imported }) {
+function PaletteGenerator({ isDark, imported, onOpenImagePalette }) {
     const initialBase = normalizeHex(imported?.base ?? '') || INITIAL_COLOR
 
     const [baseColor, setBaseColor] = useState(initialBase)
@@ -421,13 +421,29 @@ function PaletteGenerator({ isDark, imported }) {
                     </div>
                 </div>
 
-                <button
-                    type="button"
-                    onClick={() => generatePalette(randomHex(), harmony)}
-                    className="mt-6 rounded-xl bg-indigo-600 px-5 py-3 text-base font-semibold text-white transition hover:bg-indigo-500"
-                >
-                    Genera nuova palette
-                </button>
+                <div className="mt-6 flex flex-wrap gap-3">
+                    <button
+                        type="button"
+                        onClick={() => generatePalette(randomHex(), harmony)}
+                        className="rounded-xl bg-indigo-600 px-5 py-3 text-base font-semibold text-white transition hover:bg-indigo-500"
+                    >
+                        Genera nuova palette
+                    </button>
+
+                    {onOpenImagePalette && (
+                        <button
+                            type="button"
+                            onClick={onOpenImagePalette}
+                            className={`rounded-xl border px-5 py-3 text-base font-semibold transition focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                                isDark
+                                    ? 'border-gray-600 hover:bg-gray-700'
+                                    : 'border-gray-300 hover:bg-gray-100'
+                            }`}
+                        >
+                            Parti da un'immagine
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Palette */}

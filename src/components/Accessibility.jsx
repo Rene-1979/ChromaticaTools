@@ -196,11 +196,11 @@ function Accessibility({
         <section className="mx-auto max-w-5xl space-y-8 py-4">
             <header>
                 <p className="text-base font-semibold uppercase tracking-widest text-indigo-500">
-                    Chromatica Tools / Accessibilità
+                    Chromatica Tools / Daltonismo
                 </p>
 
                 <h2 className="mt-3 text-3xl font-bold sm:text-4xl">
-                    Accessibilità cromatica
+                    Daltonismo e accessibilità cromatica
                 </h2>
 
                 <p className={`mt-4 max-w-3xl text-lg leading-relaxed ${muted}`}>
