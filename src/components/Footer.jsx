@@ -1,4 +1,6 @@
 import foto from '../assets/logo.webp'
+import { SITE } from '../content/pages.js'
+import { isPlainLeftClick } from '../utils/links'
 
 function Footer({ isDark, tabs, onNavigate }) {
     const muted = isDark ? 'text-slate-300' : 'text-slate-600'
@@ -32,9 +34,9 @@ function Footer({ isDark, tabs, onNavigate }) {
 
                         <p className={`mt-4 max-w-md text-base leading-relaxed ${muted}`}>
                             Strumenti gratuiti per verificare il contrasto WCAG,
-                            creare palette (anche da un'immagine) e gradienti,
-                            simulare il daltonismo
-                            ed esportare i colori in CSS e JSON.
+                            simulare il daltonismo, analizzare l'accessibilità
+                            di un sito, creare palette (anche da un'immagine) e
+                            gradienti ed esportare i colori in CSS e JSON.
                         </p>
                     </div>
 
@@ -47,17 +49,22 @@ function Footer({ isDark, tabs, onNavigate }) {
                         <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-1">
                             {tabs.map((tab) => (
                                 <li key={tab.id}>
-                                    <button
-                                        type="button"
-                                        onClick={() => onNavigate(tab.id)}
-                                        className={`rounded-md py-2 text-left text-base font-medium transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+                                    <a
+                                        href={tab.href}
+                                        onClick={(event) => {
+                                            if (!isPlainLeftClick(event)) return
+
+                                            event.preventDefault()
+                                            onNavigate(tab.id)
+                                        }}
+                                        className={`block rounded-md py-2 text-left text-base font-medium transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                                             isDark
                                                 ? 'text-slate-200 hover:text-white'
                                                 : 'text-slate-700 hover:text-slate-950'
                                         }`}
                                     >
                                         {tab.label}
-                                    </button>
+                                    </a>
                                 </li>
                             ))}
                         </ul>
@@ -69,8 +76,23 @@ function Footer({ isDark, tabs, onNavigate }) {
                         isDark ? 'border-slate-800' : 'border-gray-200'
                     } ${muted}`}
                 >
-                    <p>© {new Date().getFullYear()} Chromatica Tools. Tutti i diritti riservati.</p>
-                    <p>I colori restano nel tuo browser: nessun dato viene salvato.</p>
+                    <p>
+                        © {new Date().getFullYear()} Chromatica Tools. Progetto
+                        gratuito, codice sorgente su{' '}
+                        <a
+                            href={SITE.github}
+                            rel="noopener"
+                            className="font-medium underline underline-offset-2 hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                        >
+                            GitHub
+                        </a>{' '}
+                        ({SITE.license}).
+                    </p>
+                    <p>
+                        Colori e immagini restano nel tuo browser. Per analizzare
+                        un sito l'indirizzo passa da un proxy che scarica la
+                        pagina.
+                    </p>
                 </div>
             </div>
         </footer>

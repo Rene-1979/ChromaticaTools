@@ -1,27 +1,44 @@
+<!doctype html>
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>Chromatica Tools – Contrasto colori WCAG, palette e gradienti</title>
-  <meta name="description" content="Strumenti gratuiti per i colori: verifica il contrasto WCAG, crea palette (anche da un'immagine) e gradienti, simula il daltonismo ed esporta in CSS e JSON." />
-  <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://chromaticatools.web.app/" />
-
-  <link rel="icon" type="image/webp" href="/logo.webp" />
   <meta name="theme-color" content="#030612" />
 
-  <!-- Anteprima quando condividi il link -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/webp" href="/logo.webp" />
+
+  <style>html,body{margin:0;background:#030612;color:#fff}</style>
+
+  <!-- seo:head:start -->
+  <!--
+    Questo blocco è valido per lo sviluppo. In produzione lo script
+    scripts/prerender.mjs lo riscrive per ogni scheda con i dati di
+    src/content/pages.js (titolo, descrizione, canonical, anteprime, JSON-LD).
+  -->
+  <title>Chromatica Tools: contrasto WCAG, palette e daltonismo</title>
+  <meta name="description" content="Strumenti gratuiti per i colori: verifica il contrasto WCAG AA e AAA, simula il daltonismo, analizza un sito e crea palette e gradienti." />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+  <link rel="canonical" href="https://chromaticatools.web.app/" />
+
   <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Chromatica Tools" />
   <meta property="og:locale" content="it_IT" />
-  <meta property="og:title" content="Chromatica Tools – Contrasto colori WCAG, palette e gradienti" />
-  <meta property="og:description" content="Verifica il contrasto WCAG, crea palette (anche da un'immagine) e gradienti, simula il daltonismo ed esporta in CSS e JSON." />
+  <meta property="og:title" content="Chromatica Tools: contrasto WCAG, palette e daltonismo" />
+  <meta property="og:description" content="Strumenti gratuiti per i colori: verifica il contrasto WCAG AA e AAA, simula il daltonismo, analizza un sito e crea palette e gradienti." />
   <meta property="og:url" content="https://chromaticatools.web.app/" />
-<meta property="og:image" content="https://chromaticatools.web.app/logo.webp" />
+  <meta property="og:image" content="https://chromaticatools.web.app/logo.webp" />
+  <meta property="og:image:alt" content="Logo di Chromatica Tools" />
   <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chromatica Tools: contrasto WCAG, palette e daltonismo" />
+  <meta name="twitter:description" content="Strumenti gratuiti per i colori: verifica il contrasto WCAG AA e AAA, simula il daltonismo, analizza un sito e crea palette e gradienti." />
+
+  <script type="application/ld+json" id="page-jsonld"></script>
+  <!-- seo:head:end -->
 </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<body>
+  <div id="root"><!-- seo:body --></div>
+  <noscript>Chromatica Tools ha bisogno di JavaScript per calcolare contrasti e palette direttamente nel tuo browser.</noscript>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
 </html>

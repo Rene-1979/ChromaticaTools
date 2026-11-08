@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { getContrastSuggestions } from '../utils/colorSuggestions'
+import { getPage } from '../content/pages.js'
 import { getWcagStatus } from '../utils/contrast'
 import ExportPanel from './ExportPanel'
 
@@ -110,6 +111,22 @@ function Contrast({
                 ${isDark ? 'text-slate-100' : 'text-slate-900'}
             `}
         >
+            <header>
+                <h1 className="text-3xl font-bold sm:text-4xl">
+                    {getPage('contrast').h1}
+                </h1>
+
+                <p
+                    className={`mt-3 max-w-3xl text-lg leading-relaxed ${
+                        isDark ? 'text-slate-300' : 'text-slate-700'
+                    }`}
+                >
+                    Scegli il colore del testo e quello dello sfondo: calcoliamo
+                    subito il rapporto di contrasto e se supera i livelli WCAG
+                    AA e AAA.
+                </p>
+            </header>
+
             <div className="grid gap-6 sm:grid-cols-2">
                 <label className="block">
                     <span className="text-base font-semibold">

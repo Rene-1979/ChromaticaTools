@@ -1,4 +1,5 @@
 
+import { getPage } from '../content/pages.js'
 import { useState } from 'react'
 import { hexToHsl, hslToHex } from '../utils/colorConversions'
 
@@ -92,9 +93,7 @@ function ColorExplorer({ isDark }) {
     return (
         <section className={`space-y-8 ${textColor}`}>
             <div>
-                <h2 className="text-3xl font-bold sm:text-4xl">
-                    Esplora colori
-                </h2>
+                <h1 className="text-3xl font-bold sm:text-4xl">{getPage('explorer').h1}</h1>
 
                 <p className={`mt-3 max-w-3xl text-lg leading-relaxed ${mutedColor}`}>
                     Analizza un colore, scopri i suoi valori e crea

@@ -1,5 +1,5 @@
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import Header from './components/Header'
 import MainNav from './components/MainNav'
@@ -12,32 +12,71 @@ import PaletteGenerator from './components/PaletteGenerator'
 import ImagePalette from './components/ImagePalette'
 import Accessibility from './components/Accessibility'
 import SiteAnalyzer from './components/SiteAnalyzer'
+import SeoContent from './components/SeoContent'
 
 import { getContrastRatio } from './utils/contrast'
+import { applyPageMeta } from './utils/pageMeta'
+import { getPage, getPageByPath } from './content/pages.js'
 
 function App() {
     const [foreground, setForeground] = useState('#FFFFFF')
     const [background, setBackground] = useState('#000000')
     const [isDark, setIsDark] = useState(true)
 
-    const [activeTab, setActiveTab] = useState('contrast')
+    // Ogni scheda ha un indirizzo proprio (content/pages.js): si parte da quello.
+    const [activeTab, setActiveTab] = useState(
+        () => getPageByPath(window.location.pathname)?.id ?? 'contrast'
+    )
 
     // Palette scelta in "Palette da immagine", da caricare nel generatore.
     const [importedPalette, setImportedPalette] = useState(null)
 
+    function showTab(id) {
+        const page = getPage(id)
+
+        if (window.location.pathname !== page.path) {
+            window.history.pushState(null, '', page.path)
+        }
+
+        setActiveTab(id)
+    }
+
     // Cambiando scheda la palette importata è già stata consumata: la dimentichiamo.
     function changeTab(id) {
-        setActiveTab(id)
+        showTab(id)
         setImportedPalette(null)
     }
 
     function applyImagePalette(palette) {
         setImportedPalette(palette)
-        setActiveTab('palettes')
+        showTab('palettes')
         window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
+    // Pulsanti avanti e indietro del browser.
+    useEffect(() => {
+        function handlePopState() {
+            setActiveTab(getPageByPath(window.location.pathname)?.id ?? 'contrast')
+            setImportedPalette(null)
+        }
+
+        window.addEventListener('popstate', handlePopState)
+        return () => window.removeEventListener('popstate', handlePopState)
+    }, [])
+
+    // Titolo, descrizione, canonical e dati strutturati seguono la scheda.
+    useEffect(() => {
+        applyPageMeta(getPage(activeTab))
+    }, [activeTab])
+
     const ratio = getContrastRatio(foreground, background)
+
+    // Voce di menu di una scheda: etichetta e indirizzo vengono da content/pages.js.
+    const entry = (id) => {
+        const page = getPage(id)
+
+        return { id, label: page.navLabel, href: page.path }
+    }
 
     // Menu principale: voci singole e gruppi con sottomenu.
     const menu = [
@@ -45,24 +84,18 @@ function App() {
             id: 'group-color-accessibility',
             label: 'Accessibilità colore',
             icon: 'contrast',
-            children: [
-                { id: 'contrast', label: 'Contrasto' },
-                { id: 'accessibility', label: 'Daltonismo' },
-            ],
+            children: [entry('contrast'), entry('accessibility')],
         },
         {
             id: 'group-analysis',
             label: 'Strumenti d\'analisi',
             icon: 'site',
-            children: [
-                { id: 'site', label: 'Analizza sito' },
-                { id: 'image-palette', label: 'Palette da immagine' },
-            ],
+            children: [entry('site'), entry('image-palette')],
         },
-        { id: 'wheel', label: 'Ruota cromatica' },
-        { id: 'palettes', label: 'Palette' },
-        { id: 'explorer', label: 'Esplora colori' },
-        { id: 'gradients', label: 'Gradienti' },
+        entry('wheel'),
+        entry('palettes'),
+        entry('explorer'),
+        entry('gradients'),
     ]
 
     // Elenco piatto di tutte le schede (titolo mobile, footer).
@@ -126,7 +159,7 @@ function App() {
 
     return (
         <div className={isDark ? 'dark' : ''}>
-            <main
+            <div
                 className={`flex min-h-screen flex-col transition-colors ${
                     isDark
                         ? 'bg-gray-950 text-white'
@@ -148,7 +181,7 @@ function App() {
                     onSelect={changeTab}
                 />
 
-                <div className="mx-auto w-full max-w-7xl flex-1 px-4 pb-12 pt-8 sm:px-6 lg:px-8">
+                <main className="mx-auto w-full max-w-7xl flex-1 px-4 pb-12 pt-8 sm:px-6 lg:px-8">
                     {activeTab === 'contrast' && (
                         <Contrast
                             foreground={foreground}
@@ -203,7 +236,13 @@ function App() {
                     {activeTab === 'gradients' && (
                         <GradientGenerator isDark={isDark} />
                     )}
-                </div>
+
+                    <SeoContent
+                        page={getPage(activeTab)}
+                        isDark={isDark}
+                        onNavigate={changeTab}
+                    />
+                </main>
 
                 <Footer
                     isDark={isDark}
@@ -213,7 +252,7 @@ function App() {
                         window.scrollTo({ top: 0, behavior: 'smooth' })
                     }}
                 />
-            </main>
+            </div>
         </div>
     )
 }

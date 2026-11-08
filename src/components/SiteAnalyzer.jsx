@@ -1,3 +1,4 @@
+import { getPage } from '../content/pages.js'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { analyzeSite } from '../utils/siteAnalyzer'
 import { VISION_LABELS } from '../utils/colorVision'
@@ -281,9 +282,7 @@ function SiteAnalyzer({ isDark }) {
                 <p className="text-base font-semibold uppercase tracking-widest text-indigo-500">
                     Chromatica Tools / Analisi sito
                 </p>
-                <h2 className="mt-3 text-3xl font-bold sm:text-4xl">
-                    Analizza un sito web
-                </h2>
+                <h1 className="mt-3 text-3xl font-bold sm:text-4xl">{getPage('site').h1}</h1>
                 <p className={`mt-4 max-w-3xl text-lg leading-relaxed ${muted}`}>
                     Inserisci l'indirizzo di una pagina: controlliamo il
                     contrasto dei testi, come cambiano i colori per chi ha un

@@ -12,7 +12,7 @@ Istruzioni per Claude Code. Leggile all'inizio di ogni sessione.
 React + Vite + Tailwind (`@tailwindcss/vite`), eslint. "Analizza sito" usa un worker Cloudflare in `proxy/` (`worker.js`, `guard.js`); l'indirizzo pubblico del worker e' in `.env.production` (`VITE_PROXY_URL`).
 
 ## Struttura (cosa e' dove)
-- `src/App.jsx`: nessun router, un solo `activeTab`. Il menu e' l'array `menu` (voci singole e gruppi con `children`): "Accessibilita' colore" (Contrasto, Daltonismo), "Strumenti d'analisi" (Analizza sito, Palette da immagine), poi Ruota cromatica, Palette, Esplora colori, Gradienti. `tabs` e' l'elenco piatto derivato (titolo mobile, footer). Le schede si smontano al cambio: il loro stato locale si perde. Per cambiare scheda usare `changeTab` (non `setActiveTab`): azzera la palette importata.
+- `src/App.jsx`: nessun router (libreria), un solo `activeTab` sincronizzato con l'indirizzo (vedi SEO e GEO). Il menu e' l'array `menu` (voci singole e gruppi con `children`): "Accessibilita' colore" (Contrasto, Daltonismo), "Strumenti d'analisi" (Analizza sito, Palette da immagine), poi Ruota cromatica, Palette, Esplora colori, Gradienti. `tabs` e' l'elenco piatto derivato (titolo mobile, footer). Le schede si smontano al cambio: il loro stato locale si perde. Per cambiare scheda usare `changeTab` (non `setActiveTab`): azzera la palette importata.
 - `src/components/MainNav.jsx`: il menu (tendine su desktop con clic, Esc, frecce; elenco raggruppato su mobile). Le voci vanno a capo, non scorrono. Per aggiungere una scheda: voce in `menu` di `App.jsx`, icona in `icons`, blocco `activeTab === ...`.
 - La scheda `accessibility` (file `Accessibility.jsx`) si chiama "Daltonismo" nell'interfaccia; l'id e i nomi dei file sono rimasti uguali.
 - `src/utils/colorHarmony.js`: **unica fonte** delle armonie (`HARMONIES`: id, etichetta, angoli HSL). La usano ruota, generatore di palette e palette da immagine. Non riscrivere angoli o etichette altrove.
@@ -28,10 +28,22 @@ React + Vite + Tailwind (`@tailwindcss/vite`), eslint. "Analizza sito" usa un wo
 - "Usa questa palette" passa `{colors, harmony, base}` ad `App`, che la da' a `PaletteGenerator` (prop `imported`): i colori occupano i primi slot, sbloccati; il resto si riempie con l'armonia.
 - Limiti noti: scala di grigi e immagini trasparenti non producono palette (messaggio); immagini quasi monocromatiche producono meno palette.
 
+## SEO e GEO (non romperli)
+- **Un indirizzo per scheda**, senza router: `src/content/pages.js` e' l'unica fonte di percorso, titolo (max 65 caratteri), descrizione (70-165), H1, risposta breve (`lead`), `steps`, `faq`, `features`, `related`. `App.jsx` legge il percorso e usa `history.pushState`; `utils/pageMeta.js` aggiorna titolo, canonical, anteprime e JSON-LD alla navigazione.
+- **Prerender** (`scripts/prerender.mjs`, eseguito da `npm run build`): scrive per ogni scheda `dist/<percorso>/index.html` con meta, JSON-LD (`content/schema.js`) e il testo in HTML statico dentro `#root` (React lo sostituisce al caricamento); genera anche `sitemap.xml`, `llms.txt` e `404.html`. `index.html` ha i marcatori `<!-- seo:head:start/end -->` e `<!-- seo:body -->`: non toglierli.
+- **Controllo:** dopo la build `npm run check:seo` (un solo H1, canonical, JSON-LD valido, link interni, sitemap, robots). Deve dare "nessun problema".
+- **Nuova scheda:** voce in `PAGES`, voce in `menu` di `App.jsx`, blocco `activeTab`, `getPage('id').h1` nell'H1 del componente, percorso nell'elenco `headers` di `firebase.json`. La scheda compare da sola in sitemap, llms.txt e link interni.
+- **Link veri:** menu, footer, logo e "altri strumenti" sono `<a href>` (clic normale resta nell'app, Ctrl/Cmd+clic apre il link): i crawler non seguono i `<button>`.
+- **Un solo H1 per pagina** (titolo della scheda dai dati); `<main>` contiene solo il contenuto, non intestazione, menu e footer.
+- **Contenuti:** niente numeri, recensioni, valutazioni o funzioni inventati; i dati strutturati devono riflettere il testo visibile. Se si cambia una funzione, aggiornare `pages.js` (e il README).
+- **Firebase:** niente `cleanUrls` (reindirizzerebbe il file di verifica Google `google2732f4e511c9cb11.html`); le pagine sono cartelle con `index.html` e `trailingSlash: false`. Nessun rewrite a `index.html`: gli indirizzi sconosciuti danno 404 vero (`404.html`, `noindex`). Se arriva un dominio personalizzato: cambiare `SITE.url` in `pages.js`, `public/robots.txt` e `index.html`.
+- **`robots.txt`** ammette tutti i crawler, AI compresi (scelta di visibilita'). Per escludere l'addestramento si puo' mettere `Disallow: /` a GPTBot, ClaudeBot, CCBot, Google-Extended, Applebot-Extended.
+
 ## Comandi
 - `npm install` (prima volta)
 - `npm run dev`
-- `npm run build`
+- `npm run build` (build + prerender SEO)
+- `npm run check:seo` (dopo la build)
 - `npm run lint`
 - `npm run preview`
 - Deploy: `firebase deploy`

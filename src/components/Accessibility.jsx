@@ -1,3 +1,4 @@
+import { getPage } from '../content/pages.js'
 import { useEffect, useState } from 'react'
 import ExportPanel from './ExportPanel'
 
@@ -199,9 +200,7 @@ function Accessibility({
                     Chromatica Tools / Daltonismo
                 </p>
 
-                <h2 className="mt-3 text-3xl font-bold sm:text-4xl">
-                    Daltonismo e accessibilità cromatica
-                </h2>
+                <h1 className="mt-3 text-3xl font-bold sm:text-4xl">{getPage('accessibility').h1}</h1>
 
                 <p className={`mt-4 max-w-3xl text-lg leading-relaxed ${muted}`}>
                     Scopri come i colori selezionati potrebbero apparire in

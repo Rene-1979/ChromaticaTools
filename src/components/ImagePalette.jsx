@@ -1,3 +1,4 @@
+import { getPage } from '../content/pages.js'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { extractColors } from '../utils/colorExtraction'
 import { buildImagePalettes } from '../utils/harmonyFromImage'
@@ -174,9 +175,7 @@ function ImagePalette({ isDark, onApplyPalette }) {
                     Chromatica Tools / Palette da immagine
                 </p>
 
-                <h2 className="mt-3 text-3xl font-bold sm:text-4xl">
-                    Palette da immagine
-                </h2>
+                <h1 className="mt-3 text-3xl font-bold sm:text-4xl">{getPage('image-palette').h1}</h1>
 
                 <p className={`mt-4 max-w-3xl text-lg leading-relaxed ${muted}`}>
                     Carica una foto o un logo: partendo dai suoi colori reali

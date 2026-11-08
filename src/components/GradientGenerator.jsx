@@ -1,3 +1,4 @@
+import { getPage } from '../content/pages.js'
 import { useState } from 'react'
 import ExportPanel from './ExportPanel'
 
@@ -163,9 +164,7 @@ function GradientGenerator({ isDark }) {
     return (
         <section className={`space-y-6 ${textColor}`}>
             <div>
-                <h2 className="text-3xl font-bold">
-                    Generatore di gradienti
-                </h2>
+                <h1 className="text-3xl font-bold">{getPage('gradients').h1}</h1>
                 <p className={`mt-3 text-base leading-relaxed ${mutedColor}`}>
                     Crea sfumature personalizzate, regola i colori e copia
                     il CSS da utilizzare nei tuoi progetti.

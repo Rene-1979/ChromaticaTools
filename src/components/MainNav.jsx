@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { isPlainLeftClick } from '../utils/links'
 
 function Chevron({ open }) {
     return (
@@ -57,6 +58,15 @@ function MainNav({ isDark, menu, tabs, icons, activeTab, onSelect }) {
         onSelect(id)
         setOpenGroup(null)
         setIsMobileOpen(false)
+    }
+
+    // Link veri (indirizzo proprio per ogni scheda): il clic normale resta
+    // nell'app, Ctrl/Cmd+clic apre il link in una nuova scheda del browser.
+    function handleLink(event, id) {
+        if (!isPlainLeftClick(event)) return
+
+        event.preventDefault()
+        select(id)
     }
 
     function handleTriggerKeyDown(event, group) {
@@ -192,10 +202,10 @@ function MainNav({ isDark, menu, tabs, icons, activeTab, onSelect }) {
                                     const isActive = activeTab === entry.id
 
                                     return (
-                                        <button
+                                        <a
                                             key={entry.id}
-                                            type="button"
-                                            onClick={() => select(entry.id)}
+                                            href={entry.href}
+                                            onClick={(event) => handleLink(event, entry.id)}
                                             aria-current={isActive ? 'page' : undefined}
                                             className={`flex w-full items-center rounded-xl px-4 py-3 text-left text-base font-semibold transition-colors ${focusRing} ${
                                                 isActive ? 'bg-indigo-600 text-white' : idleClass
@@ -207,7 +217,7 @@ function MainNav({ isDark, menu, tabs, icons, activeTab, onSelect }) {
                                                     Attivo
                                                 </span>
                                             )}
-                                        </button>
+                                        </a>
                                     )
                                 })}
                             </div>
@@ -222,10 +232,10 @@ function MainNav({ isDark, menu, tabs, icons, activeTab, onSelect }) {
                             const isActive = activeTab === item.id
 
                             return (
-                                <button
+                                <a
                                     key={item.id}
-                                    type="button"
-                                    onClick={() => select(item.id)}
+                                    href={item.href}
+                                    onClick={(event) => handleLink(event, item.id)}
                                     aria-current={isActive ? 'page' : undefined}
                                     className={`flex shrink-0 items-center gap-2.5 rounded-xl px-4 py-3 text-base font-semibold transition-all duration-200 ${focusRing} ${
                                         isActive ? activeClass : idleClass
@@ -235,7 +245,7 @@ function MainNav({ isDark, menu, tabs, icons, activeTab, onSelect }) {
                                         {icons[item.icon ?? item.id]}
                                     </span>
                                     <span>{item.label}</span>
-                                </button>
+                                </a>
                             )
                         }
 
@@ -286,12 +296,12 @@ function MainNav({ isDark, menu, tabs, icons, activeTab, onSelect }) {
 
                                             return (
                                                 <li key={child.id}>
-                                                    <button
+                                                    <a
                                                         ref={(element) => {
                                                             itemRefs.current[`${item.id}:${index}`] = element
                                                         }}
-                                                        type="button"
-                                                        onClick={() => select(child.id)}
+                                                        href={child.href}
+                                                        onClick={(event) => handleLink(event, child.id)}
                                                         onKeyDown={(event) =>
                                                             handlePanelKeyDown(event, item, index)
                                                         }
@@ -301,7 +311,7 @@ function MainNav({ isDark, menu, tabs, icons, activeTab, onSelect }) {
                                                         }`}
                                                     >
                                                         {child.label}
-                                                    </button>
+                                                    </a>
                                                 </li>
                                             )
                                         })}

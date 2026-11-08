@@ -1,4 +1,5 @@
 
+import { getPage } from '../content/pages.js'
 import { useState, useRef } from 'react'
 import { hslToHex } from '../utils/colorConversions'
 import { HARMONIES } from '../utils/colorHarmony'
@@ -260,9 +261,7 @@ function ColorWheel({ onColorSelect, isDark }) {
             isDark ? 'text-slate-100' : 'text-slate-900'
         }`}>
             <div>
-                <h2 className="text-3xl font-bold sm:text-4xl">
-                    Ruota cromatica
-                </h2>
+                <h1 className="text-3xl font-bold sm:text-4xl">{getPage('wheel').h1}</h1>
 
                 <p className={`mt-3 max-w-3xl text-lg leading-relaxed ${muted}`}>
                     Trascina i punti sulla ruota, modifica i codici HEX

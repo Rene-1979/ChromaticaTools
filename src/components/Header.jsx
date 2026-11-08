@@ -1,5 +1,6 @@
 
 import foto from '../assets/logo.webp'
+import { isPlainLeftClick } from '../utils/links'
 
 function Header({ isDark, onToggleDarkMode, onGoHome }) {
     return (
@@ -15,9 +16,14 @@ function Header({ isDark, onToggleDarkMode, onGoHome }) {
         >
             <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
                 {/* Logo cliccabile */}
-                <button
-                    type="button"
-                    onClick={onGoHome}
+                <a
+                    href="/"
+                    onClick={(event) => {
+                        if (!isPlainLeftClick(event)) return
+
+                        event.preventDefault()
+                        onGoHome()
+                    }}
                     className="flex min-w-0 items-center gap-3 rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                     aria-label="Chromatica Tools: torna alla scheda Contrasto"
                     title="Torna alla scheda Contrasto"
@@ -43,7 +49,7 @@ function Header({ isDark, onToggleDarkMode, onGoHome }) {
                             COLORI · CONTRASTI · ACCESSIBILITÀ
                         </span>
                     </span>
-                </button>
+                </a>
 
                 {/* Pulsante tema */}
                 <button

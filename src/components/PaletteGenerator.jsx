@@ -1,4 +1,5 @@
 
+import { getPage } from '../content/pages.js'
 import { useState } from 'react'
 import { HARMONIES, getColorHarmony } from '../utils/colorHarmony'
 import { hexToHsl, hslToHex } from '../utils/colorConversions'
@@ -327,9 +328,7 @@ function PaletteGenerator({ isDark, imported, onOpenImagePalette }) {
     return (
         <section className={`space-y-6 ${textColor}`}>
             <div>
-                <h2 className="text-3xl font-bold">
-                    Generatore di palette
-                </h2>
+                <h1 className="text-3xl font-bold">{getPage('palettes').h1}</h1>
                 <p className={`mt-3 text-base leading-relaxed ${mutedColor}`}>
                     Crea combinazioni cromatiche, blocca i colori
                     preferiti e copia la palette nei tuoi progetti.
