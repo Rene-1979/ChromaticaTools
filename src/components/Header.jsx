@@ -1,5 +1,6 @@
 
 import foto from '../assets/logo.webp'
+import { SITE } from '../content/pages.js'
 import { isPlainLeftClick } from '../utils/links'
 
 function Header({ isDark, onToggleDarkMode, onGoHome }) {
@@ -30,7 +31,7 @@ function Header({ isDark, onToggleDarkMode, onGoHome }) {
                 >
                     <img
                         src={foto}
-                        alt=""
+                        alt={SITE.logoAlt}
                         className="h-11 w-11 shrink-0 rounded-xl object-cover sm:h-14 sm:w-14"
                     />
 

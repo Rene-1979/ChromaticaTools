@@ -91,6 +91,12 @@ if (/Disallow:\s*\//.test(robots)) problems.push('robots.txt: blocca il sito')
 if (!read('llms.txt').startsWith(`# ${SITE.name}`)) problems.push('llms.txt: intestazione errata')
 if (!/noindex/.test(read('404.html'))) problems.push('404.html: manca noindex')
 
+// IndexNow: il file con la chiave deve esistere e contenere la chiave
+const keyFile = resolve(dist, `${SITE.indexNowKey}.txt`)
+if (!existsSync(keyFile) || readFileSync(keyFile, 'utf8').trim() !== SITE.indexNowKey) {
+    problems.push('IndexNow: file chiave mancante o diverso in dist/')
+}
+
 if (!existsSync(resolve(dist, 'google2732f4e511c9cb11.html'))) {
     problems.push('manca il file di verifica di Google Search Console')
 }

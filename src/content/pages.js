@@ -20,6 +20,8 @@ export const SITE = {
     summary:
         "Strumenti gratuiti, in italiano, per lavorare con i colori in modo accessibile: contrasto WCAG, simulazione del daltonismo, analisi di un sito web, palette (anche da un'immagine), ruota cromatica, gradienti ed esplorazione dei colori. Funziona nel browser: i colori e le immagini restano sul tuo dispositivo.",
     updated: '2026-11-08',
+    // Chiave IndexNow: pubblica per definizione (il file public/<chiave>.txt la contiene).
+    indexNowKey: 'c48a87a2d45d0ada2babc59cabc42e92',
 }
 
 export const PAGES = [

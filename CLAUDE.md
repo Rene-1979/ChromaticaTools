@@ -32,6 +32,7 @@ React + Vite + Tailwind (`@tailwindcss/vite`), eslint. "Analizza sito" usa un wo
 - **Un indirizzo per scheda**, senza router: `src/content/pages.js` e' l'unica fonte di percorso, titolo (max 65 caratteri), descrizione (70-165), H1, risposta breve (`lead`), `steps`, `faq`, `features`, `related`. `App.jsx` legge il percorso e usa `history.pushState`; `utils/pageMeta.js` aggiorna titolo, canonical, anteprime e JSON-LD alla navigazione.
 - **Prerender** (`scripts/prerender.mjs`, eseguito da `npm run build`): scrive per ogni scheda `dist/<percorso>/index.html` con meta, JSON-LD (`content/schema.js`) e il testo in HTML statico dentro `#root` (React lo sostituisce al caricamento); genera anche `sitemap.xml`, `llms.txt` e `404.html`. `index.html` ha i marcatori `<!-- seo:head:start/end -->` e `<!-- seo:body -->`: non toglierli.
 - **Controllo:** dopo la build `npm run check:seo` (un solo H1, canonical, JSON-LD valido, link interni, sitemap, robots). Deve dare "nessun problema".
+- **IndexNow:** chiave pubblica in `SITE.indexNowKey` (`pages.js`) e nel file `public/<chiave>.txt` (deve restare: Bing lo controlla; `check:seo` lo verifica). Dopo ogni deploy che cambia pagine o indirizzi: `npm run indexnow` (verifica che il file chiave sia online, poi invia gli indirizzi a Bing; 200/202 = ricevuto). Google non lo supporta: per Google serve la Search Console.
 - **Nuova scheda:** voce in `PAGES`, voce in `menu` di `App.jsx`, blocco `activeTab`, `getPage('id').h1` nell'H1 del componente, percorso nell'elenco `headers` di `firebase.json`. La scheda compare da sola in sitemap, llms.txt e link interni.
 - **Link veri:** menu, footer, logo e "altri strumenti" sono `<a href>` (clic normale resta nell'app, Ctrl/Cmd+clic apre il link): i crawler non seguono i `<button>`.
 - **Un solo H1 per pagina** (titolo della scheda dai dati); `<main>` contiene solo il contenuto, non intestazione, menu e footer.
@@ -44,6 +45,7 @@ React + Vite + Tailwind (`@tailwindcss/vite`), eslint. "Analizza sito" usa un wo
 - `npm run dev`
 - `npm run build` (build + prerender SEO)
 - `npm run check:seo` (dopo la build)
+- `npm run indexnow` (dopo il deploy, avvisa Bing degli indirizzi)
 - `npm run lint`
 - `npm run preview`
 - Deploy: `firebase deploy`

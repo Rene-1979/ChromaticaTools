@@ -23,7 +23,7 @@ function Footer({ isDark, tabs, onNavigate }) {
                         <div className="flex items-center gap-3">
                             <img
                                 src={foto}
-                                alt=""
+                                alt={SITE.logoAlt}
                                 className="h-11 w-11 shrink-0 rounded-xl object-cover"
                             />
 

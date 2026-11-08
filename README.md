@@ -79,6 +79,7 @@ Il sito è una app React, ma ogni strumento ha un **indirizzo proprio** (`/dalto
 - **Dati strutturati** (JSON-LD, schema.org): `WebSite`, `WebApplication`, `FAQPage` e `BreadcrumbList`, solo con informazioni presenti nella pagina.
 - **`robots.txt`** consente motori di ricerca e crawler degli assistenti AI e indica la sitemap.
 - `npm run check:seo` controlla titoli, descrizioni, un solo H1, JSON-LD, link interni, sitemap e robots.
+- **IndexNow:** dopo ogni pubblicazione `npm run indexnow` avvisa Bing (e gli altri motori che lo supportano, non Google) degli indirizzi del sito; la chiave pubblica è in `public/` e in `src/content/pages.js`.
 
 ### Sviluppo locale
 
@@ -209,6 +210,7 @@ The site is a React app, but every tool has its **own URL** (`/daltonismo`, `/an
 - **Structured data** (JSON-LD, schema.org): `WebSite`, `WebApplication`, `FAQPage` and `BreadcrumbList`, using only information that appears on the page.
 - **`robots.txt`** allows search engines and AI assistant crawlers and points to the sitemap.
 - `npm run check:seo` checks titles, descriptions, a single H1, JSON-LD, internal links, sitemap and robots.
+- **IndexNow:** after each deployment `npm run indexnow` notifies Bing (and the other engines that support it, not Google) of the site's URLs; the public key lives in `public/` and in `src/content/pages.js`.
 
 ### Local development
 
