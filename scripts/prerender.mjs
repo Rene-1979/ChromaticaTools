@@ -167,6 +167,9 @@ ${PAGES.map(
 `
 write('sitemap.xml', sitemap)
 
+// Stessi indirizzi in formato testo (uno per riga): seconda strada per Google e Bing
+write('sitemap.txt', `${PAGES.map(getPageUrl).join('\n')}\n`)
+
 // --- llms.txt: riassunto per assistenti AI (https://llmstxt.org) ---
 const llms = `# ${SITE.name}
 
@@ -214,5 +217,5 @@ const notFound = `<!doctype html>
 write('404.html', notFound)
 
 console.log(
-    `Prerender completato: ${PAGES.length} pagine, sitemap.xml, llms.txt, 404.html`
+    `Prerender completato: ${PAGES.length} pagine, sitemap.xml, sitemap.txt, llms.txt, 404.html`
 )

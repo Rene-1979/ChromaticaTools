@@ -75,7 +75,7 @@ L'analisi vera e propria avviene **nel browser**: HTML e CSS vengono caricati in
 Il sito è una app React, ma ogni strumento ha un **indirizzo proprio** (`/daltonismo`, `/analizza-sito`, `/palette-da-immagine`, …) e dopo la build ogni indirizzo è anche un **file HTML statico** con titolo, descrizione, testo, link e dati strutturati già scritti: motori di ricerca e assistenti AI che non eseguono JavaScript leggono quindi il contenuto completo.
 
 - **Testi e dati** di tutte le schede in un solo file: [`src/content/pages.js`](src/content/pages.js) (titolo, descrizione, risposta breve, istruzioni, domande frequenti).
-- **Prerender:** [`scripts/prerender.mjs`](scripts/prerender.mjs) genera l'HTML di ogni scheda, `sitemap.xml`, `llms.txt` e la pagina 404.
+- **Prerender:** [`scripts/prerender.mjs`](scripts/prerender.mjs) genera l'HTML di ogni scheda, `sitemap.xml` (e la stessa lista in `sitemap.txt`), `llms.txt` e la pagina 404.
 - **Dati strutturati** (JSON-LD, schema.org): `WebSite`, `WebApplication`, `FAQPage` e `BreadcrumbList`, solo con informazioni presenti nella pagina.
 - **`robots.txt`** consente motori di ricerca e crawler degli assistenti AI e indica la sitemap.
 - `npm run check:seo` controlla titoli, descrizioni, un solo H1, JSON-LD, link interni, sitemap e robots.
@@ -206,7 +206,7 @@ The analysis itself runs **in the browser**: the HTML and CSS are loaded into an
 The site is a React app, but every tool has its **own URL** (`/daltonismo`, `/analizza-sito`, `/palette-da-immagine`, …) and after the build every URL is also a **static HTML file** with title, description, text, links and structured data already written in it: search engines and AI assistants that do not run JavaScript can read the full content.
 
 - **Copy and data** for all tabs live in one file: [`src/content/pages.js`](src/content/pages.js) (title, description, short answer, steps, FAQ).
-- **Prerender:** [`scripts/prerender.mjs`](scripts/prerender.mjs) generates each tab's HTML, `sitemap.xml`, `llms.txt` and the 404 page.
+- **Prerender:** [`scripts/prerender.mjs`](scripts/prerender.mjs) generates each tab's HTML, `sitemap.xml` (and the same list as `sitemap.txt`), `llms.txt` and the 404 page.
 - **Structured data** (JSON-LD, schema.org): `WebSite`, `WebApplication`, `FAQPage` and `BreadcrumbList`, using only information that appears on the page.
 - **`robots.txt`** allows search engines and AI assistant crawlers and points to the sitemap.
 - `npm run check:seo` checks titles, descriptions, a single H1, JSON-LD, internal links, sitemap and robots.

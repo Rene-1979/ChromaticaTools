@@ -84,8 +84,14 @@ for (const page of PAGES) {
     if (!locs.includes(getPageUrl(page))) problems.push(`sitemap: manca ${getPageUrl(page)}`)
 }
 
+const txtLocs = read('sitemap.txt').split('\n').map((line) => line.trim()).filter(Boolean)
+if (txtLocs.length !== PAGES.length || !PAGES.every((page) => txtLocs.includes(getPageUrl(page)))) {
+    problems.push('sitemap.txt: indirizzi diversi da quelli delle pagine')
+}
+
 const robots = read('robots.txt')
-if (!robots.includes(`Sitemap: ${SITE.url}/sitemap.xml`)) problems.push('robots.txt: manca la riga Sitemap')
+if (!robots.includes(`Sitemap: ${SITE.url}/sitemap.xml`)) problems.push('robots.txt: manca la riga Sitemap (xml)')
+if (!robots.includes(`Sitemap: ${SITE.url}/sitemap.txt`)) problems.push('robots.txt: manca la riga Sitemap (txt)')
 if (/Disallow:\s*\//.test(robots)) problems.push('robots.txt: blocca il sito')
 
 if (!read('llms.txt').startsWith(`# ${SITE.name}`)) problems.push('llms.txt: intestazione errata')
